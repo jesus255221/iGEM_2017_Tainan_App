@@ -20,7 +20,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".WebView_Activity"></activity>
+        <activity android:name=".WebView_Activity" />
+        <activity android:name=".DatabaseHelper"></activity>
     </application>
 
 </manifest>
