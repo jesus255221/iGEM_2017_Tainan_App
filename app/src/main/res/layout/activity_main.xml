@@ -9,12 +9,12 @@
     android:orientation="vertical">
 
     <EditText
-        android:id="@+id/eidttext1"
+        android:id="@+id/name"
         android:hint="name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <EditText
-        android:id="@+id/eidttext2"
+        android:id="@+id/glucose"
         android:hint="glucose"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

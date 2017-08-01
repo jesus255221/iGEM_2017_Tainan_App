@@ -19,10 +19,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         database.execSQL("CREATE TABLE DATA ("
                 + "_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "NAME TEXT, "
-                + "GLUCOSE INTEGER );"
+                + "GLUCOSE INTEGER, "
+                + "POST INTEGER);"
         );
-        insertData(database,"David",123);
-        insertData(database,"WTF",9487);
+        //insertData(database,"David",123,0);
+        insertData(database,"Test",9487,0);
     }
 
     @Override
@@ -30,10 +31,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public static void insertData(SQLiteDatabase database,String name,Integer glucose){
+    public static void insertData(SQLiteDatabase database,String name,Integer glucose,Integer post){
         ContentValues contentValues = new ContentValues();
         contentValues.put("NAME",name);
         contentValues.put("GLUCOSE",glucose);
+        contentValues.put("POST",post);
         database.insert("DATA",null,contentValues);
     }
 }

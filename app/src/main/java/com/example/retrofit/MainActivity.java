@@ -38,9 +38,6 @@ import retrofit2.http.Path;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ArrayList<String> name = new ArrayList<String>();
-    private ArrayList<String> glucose = new ArrayList<String>();
-
     public interface Service {
         @FormUrlEncoded
         @POST("/users")
@@ -67,13 +64,22 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //PostData();
-                EditText editText1 = (EditText) findViewById(R.id.eidttext1);
-                EditText editText2 = (EditText) findViewById(R.id.eidttext2);
+                EditText name = (EditText)findViewById(R.id.name);
+                EditText glucose = (EditText) findViewById(R.id.glucose);
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("NAME",name.getText().toString());
+                contentValues.put("GLUCOSE",Integer.parseInt(glucose.getText().toString()));
+                contentValues.put("POST",0);
+                SQLiteOpenHelper helper = new DatabaseHelper(MainActivity.this);
+                SQLiteDatabase database = helper.getWritableDatabase();
+                database.insert("DATA",null,contentValues);
+                PostData();
+                /*EditText name = (EditText) findViewById(R.id.name);
+                EditText glucose = (EditText) findViewById(R.id.glucose);
                 SQLiteOpenHelper sqLiteOpenHelper = new DatabaseHelper(MainActivity.this);
                 try {
                     SQLiteDatabase database = sqLiteOpenHelper.getReadableDatabase();
-                    DatabaseHelper.insertData(database,editText1.getText().toString(),Integer.parseInt(editText2.getText().toString()));
+                    DatabaseHelper.insertData(database,name.getText().toString(),Integer.parseInt(glucose.getText().toString()),0);
                     Cursor cursor = database.query("DATA",
                             new String[]{"_id","NAME"}, null, null, null, null, null);
                     CursorAdapter cursorAdapter = new SimpleCursorAdapter(
@@ -86,10 +92,12 @@ public class MainActivity extends AppCompatActivity {
                     );
                     ListView listView = (ListView) findViewById(R.id.data);
                     listView.setAdapter(cursorAdapter);
+                    Toast toast = Toast.makeText(MainActivity.this, "DB success", Toast.LENGTH_LONG);
+                    toast.show();
                 } catch (SQLiteException e) {
                     Toast toast = Toast.makeText(MainActivity.this, "DB failed", Toast.LENGTH_LONG);
                     toast.show();
-                }
+                }*/
             }
         });
         Button WebView_Button = (Button) findViewById(R.id.WebView_Button);
@@ -123,33 +131,82 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onRestart(){
+        super.onRestart();
+        SQLiteOpenHelper sqLiteOpenHelper = new DatabaseHelper(MainActivity.this);
+        try {
+            SQLiteDatabase database = sqLiteOpenHelper.getReadableDatabase();
+            Cursor cursor = database.query("DATA",
+                    new String[]{"_id","NAME"}, null, null, null, null, null);
+            CursorAdapter cursorAdapter = new SimpleCursorAdapter(
+                    MainActivity.this,
+                    android.R.layout.simple_list_item_1,
+                    cursor,
+                    new String[]{"NAME"},
+                    new int[]{android.R.id.text1},
+                    0
+            );
+            ListView listView = (ListView) findViewById(R.id.data);
+            listView.setAdapter(cursorAdapter);
+        } catch (SQLiteException e) {
+            Toast toast = Toast.makeText(MainActivity.this, "DB failed", Toast.LENGTH_LONG);
+            toast.show();
+        }
+    }
+
     public boolean PostData() {
-        EditText editText1 = (EditText) findViewById(R.id.eidttext1);
-        EditText editText2 = (EditText) findViewById(R.id.eidttext2);
-        name.add(editText1.getText().toString());
-        glucose.add(editText2.getText().toString());
         if (isNetworkConnected()) {
             Retrofit retrofit = new Retrofit
                     .Builder()
                     .baseUrl("http://jia.ee.ncku.edu.tw")
                     .addConverterFactory(GsonConverterFactory.create()).build();
             Service service = retrofit.create(Service.class);
-            for (int i = 0; i < this.name.size(); i++) {
-                Call<JsonResponse> post = service.Create(name.get(i), glucose.get(i));
-                post.enqueue(new Callback<JsonResponse>() {
-                    @Override
-                    public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
-                        TextView textView = (TextView) findViewById(R.id.textview);
-                        textView.setText(response.body().getMessage());
-                    }
+            SQLiteOpenHelper sqLiteOpenHelper = new DatabaseHelper(this);
+            try {
+                SQLiteDatabase database = sqLiteOpenHelper.getWritableDatabase();
+                Cursor cursor = database.query("DATA", new String[]{"_id", "NAME", "GLUCOSE"}, "POST = ?",
+                        new String[]{Integer.toString(0)}, null, null, null);
+                if (cursor.moveToFirst()) {
+                    for (int i = 0; i < cursor.getCount(); i++) {
+                        Call<JsonResponse> post = service.Create(cursor.getString(1), Integer.toString(cursor.getInt(2)));
+                        post.enqueue(new Callback<JsonResponse>() {
+                            @Override
+                            public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
+                                TextView textView = (TextView) findViewById(R.id.textview);
+                                textView.setText(response.body().getMessage());
+                            }
 
-                    @Override
-                    public void onFailure(Call<JsonResponse> call, Throwable t) {
-                        TextView textView = (TextView) findViewById(R.id.textview);
-                        textView.setText(t.toString());
+                            @Override
+                            public void onFailure(Call<JsonResponse> call, Throwable t) {
+                                TextView textView = (TextView) findViewById(R.id.textview);
+                                textView.setText(t.toString());
+                            }
+                        });
+                        ContentValues contentValues = new ContentValues();
+                        contentValues.put("POST",1);
+                        try{
+                            database.update("DATA",contentValues,"_id = ?",new String[]{Integer.toString(cursor.getInt(0))});
+                        }
+                        catch (SQLiteException e){
+                            Toast toast = Toast.makeText(MainActivity.this,e.getMessage().toString(),Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                        cursor.moveToNext();
                     }
-                });
+                }
+                database.close();
+                cursor.close();
+            } catch (SQLiteException e) {
+                Toast toast = Toast.makeText(MainActivity.this, e.getMessage().toString(), Toast.LENGTH_LONG);
+                toast.show();
+                return false;
             }
+        } else {
+            Toast toast = Toast.makeText(MainActivity.this, "No Internet connection", Toast.LENGTH_LONG);
+            toast.show();
+            return false;
+        }
             /*Call<JsonResponse> put = service.Update("5953c40f86cd4e51735883af","Hi","777");
             put.enqueue(new Callback<JsonResponse>() {
             @Override
@@ -164,14 +221,7 @@ public class MainActivity extends AppCompatActivity {
                 textView.setText(t.toString());
             }
         });*/
-            name.clear();
-            glucose.clear();
             return true;
-        } else {
-            TextView textView = (TextView) findViewById(R.id.textview);
-            textView.setText("No internet connection");
-            return false;
-        }
     }
 
     private boolean isNetworkConnected() {
