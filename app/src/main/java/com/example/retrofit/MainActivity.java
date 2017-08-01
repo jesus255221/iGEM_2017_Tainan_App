@@ -110,6 +110,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        Button Map_Button = (Button)findViewById(R.id.Map_Button);
+        Map_Button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+                startActivity(intent);
+            }
+        });
         SQLiteOpenHelper sqLiteOpenHelper = new DatabaseHelper(MainActivity.this);
         try {
             SQLiteDatabase database = sqLiteOpenHelper.getReadableDatabase();
