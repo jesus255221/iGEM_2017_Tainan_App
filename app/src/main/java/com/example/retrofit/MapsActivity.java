@@ -59,11 +59,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         PolylineOptions rectOptions = new PolylineOptions()
-                .add(new LatLng(37.35, -122.0))
-                .add(new LatLng(37.45, -122.0))  // North of the previous point, but at the same longitude
-                .add(new LatLng(37.45, -122.2))  // Same latitude, and 30km to the west
-                .add(new LatLng(37.35, -122.2))  // Same longitude, and 16km to the south
-                .add(new LatLng(37.35, -122.0)); // Closes the polyline.
+                .add(new LatLng(22.59, 120.13))
+                .add(new LatLng(22.37, 120.66))
+                .add(new LatLng(22.67, 120.43));
+                //.add(new LatLng(37.45, -122.0))  // North of the previous point, but at the same longitude
+                //.add(new LatLng(37.45, -122.2))  // Same latitude, and 30km to the west
+                //.add(new LatLng(37.35, -122.2))  // Same longitude, and 16km to the south
+                //.add(new LatLng(37.35, -122.0)); // Closes the polyline.
         mMap.addPolyline(rectOptions);
     }
 
