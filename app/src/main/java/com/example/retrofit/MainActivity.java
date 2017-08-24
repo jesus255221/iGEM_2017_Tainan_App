@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,8 +31,10 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -45,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
                 @Field("name") String name,
                 @Field("glucose") String glucose
         );
-
         @FormUrlEncoded
         @PUT("/users/{id}")
         Call<JsonResponse> Update(
@@ -53,6 +55,14 @@ public class MainActivity extends AppCompatActivity {
                 @Field("name") String name,
                 @Field("glucose") String glucose
         );
+        /*@POST("/.json")
+        Call<String> PostArray(
+                @Body List<GlucoseData> data
+        );
+        @GET("/users")
+        Call<List<UsersResponses>> GetUsersInformations();*/
+        @GET("/locations/array")
+        Call<locationsResponse> GetLocations();
     }
 
 
