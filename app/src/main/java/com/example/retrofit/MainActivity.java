@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText name = (EditText)findViewById(R.id.name);
+                /*EditText name = (EditText)findViewById(R.id.name);
                 EditText glucose = (EditText) findViewById(R.id.glucose);
                 ContentValues contentValues = new ContentValues();
                 contentValues.put("NAME",name.getText().toString());
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                 SQLiteDatabase database = helper.getWritableDatabase();
                 database.insert("DATA",null,contentValues);
                 PostData();
-                /*EditText name = (EditText) findViewById(R.id.name);
+                EditText name = (EditText) findViewById(R.id.name);
                 EditText glucose = (EditText) findViewById(R.id.glucose);
                 SQLiteOpenHelper sqLiteOpenHelper = new DatabaseHelper(MainActivity.this);
                 try {
@@ -108,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
                     Toast toast = Toast.makeText(MainActivity.this, "DB failed", Toast.LENGTH_LONG);
                     toast.show();
                 }*/
+                Intent intent = new Intent(MainActivity.this,Graph.class);
+                startActivity(intent);
             }
         });
         Button WebView_Button = (Button) findViewById(R.id.WebView_Button);

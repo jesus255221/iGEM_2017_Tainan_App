@@ -34,6 +34,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private ArrayList<Double> longitude = new ArrayList<>();
     private ArrayList<Double> latituude = new ArrayList<>();
+    private ArrayList<LatLng> latLngs = new ArrayList<>();
     private GoogleMap mMap;
     private final int MY_LOCATION_REQUEST_CODE = 1;
 
@@ -45,7 +46,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        Button Update_Button = (Button)findViewById(R.id.update_button);
+        Button Update_Button = (Button) findViewById(R.id.update_button);
         Update_Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,30 +65,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         // Add a marker in Sydney and move the camera
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
         } else {
             // Show rationale and request permission.
-            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},MY_LOCATION_REQUEST_CODE);
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOCATION_REQUEST_CODE);
         }
-        LatLng sydney = new LatLng(22.59, 120.13);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        LatLng sydney = new LatLng(22.995571, 120.221539);
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker of my home"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-//        PolylineOptions rectOptions = new PolylineOptions()
-//                .add(new LatLng(22.59, 120.13))
-//                .add(new LatLng(22.37, 120.66))
-//                .add(new LatLng(22.67, 120.43));
-                //.add(new LatLng(37.45, -122.0))  // North of the previous point, but at the same longitude
-                //.add(new LatLng(37.45, -122.2))  // Same latitude, and 30km to the west
-                //.add(new LatLng(37.35, -122.2))  // Same longitude, and 16km to the south
-                //.add(new LatLng(37.35, -122.0)); // Closes the polyline.
-//        mMap.addPolyline(rectOptions);
     }
 
     @Override
@@ -99,18 +91,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                         mMap.setMyLocationEnabled(true);
                     }
-                }
-                else{
-                    Toast.makeText(getApplicationContext(),"Location permissions ERROR",Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Location permissions ERROR", Toast.LENGTH_LONG).show();
                     finish();
                 }
                 break;
         }
     }
 
-    public boolean GetData(){
-        if(isNetworkConnected()){
-            Retrofit retrofit = new Retrofit
+    public boolean GetData() {
+        if (isNetworkConnected()) {
+            /*Retrofit retrofit = new Retrofit
                     .Builder()
                     .baseUrl("http://jia.ee.ncku.edu.tw")
                     .addConverterFactory(GsonConverterFactory.create()).build();
@@ -119,29 +110,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             get.enqueue(new Callback<locationsResponse>() {
                 @Override
                 public void onResponse(Call<locationsResponse> call, Response<locationsResponse> response) {
-                    for(int i = 0; i < 3; i++){
-                        try {
-                            longitude.add(response.body().getLocations().get(i).getLongitude());
-                        } catch (Exception e){
-                            Toast.makeText(getApplicationContext(),e.getMessage().toString(),Toast.LENGTH_LONG);
-                        }
-                    }
-                    for(int i = 0; i < 3; i++){
-                        latituude.add(response.body().getLocations().get(i).getLatitude());
+                    for (int i = 0; i < response.body().getLocations().size(); i++) {
+                        latituude.add(i, response.body().getLocations().get(i).getLatitude() / 100);
+                        longitude.add(i, response.body().getLocations().get(i).getLongitude() / 100);
+                        latLngs.add(i, new LatLng(latituude.get(i),longitude.get(i)));
                     }
                 }
+
                 @Override
                 public void onFailure(Call<locationsResponse> call, Throwable t) {
-
+                    Toast.makeText(getApplicationContext(), t.getMessage().toString(), Toast.LENGTH_LONG).show();
                 }
-            });
+            });*/
             PolylineOptions rectOptions = new PolylineOptions();
-            for(int i = 0;i < latituude.size();i++){
-                rectOptions.add(new LatLng(latituude.get(i) / 100.0,longitude.get(i)/100.0));
-            }
+            //rectOptions.addAll(latLngs);
+            /*rectOptions.add(new LatLng(22.995571, 120.221539))
+                    .add(new LatLng(23, 120.25))
+                    .add(new LatLng(22.993362, 120.223539))
+                    .add(new LatLng(22.995571, 120.221539));*/
             mMap.addPolyline(rectOptions);
+            latituude.clear();
+            longitude.clear();
+            latLngs.clear();
             return true;
-        } else{
+        } else {
             Toast.makeText(this, "NetWorkERROR", Toast.LENGTH_SHORT).show();
             return false;
         }
