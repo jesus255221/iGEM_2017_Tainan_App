@@ -101,7 +101,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public boolean GetData() {
         if (isNetworkConnected()) {
-            /*Retrofit retrofit = new Retrofit
+            Retrofit retrofit = new Retrofit
                     .Builder()
                     .baseUrl("http://jia.ee.ncku.edu.tw")
                     .addConverterFactory(GsonConverterFactory.create()).build();
@@ -113,7 +113,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     for (int i = 0; i < response.body().getLocations().size(); i++) {
                         latituude.add(i, response.body().getLocations().get(i).getLatitude() / 100);
                         longitude.add(i, response.body().getLocations().get(i).getLongitude() / 100);
-                        latLngs.add(i, new LatLng(latituude.get(i),longitude.get(i)));
+                        latLngs.add(i, new LatLng(latituude.get(i), longitude.get(i)));
                     }
                 }
 
@@ -121,13 +121,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onFailure(Call<locationsResponse> call, Throwable t) {
                     Toast.makeText(getApplicationContext(), t.getMessage().toString(), Toast.LENGTH_LONG).show();
                 }
-            });*/
+            });
             PolylineOptions rectOptions = new PolylineOptions();
-            //rectOptions.addAll(latLngs);
-            /*rectOptions.add(new LatLng(22.995571, 120.221539))
-                    .add(new LatLng(23, 120.25))
-                    .add(new LatLng(22.993362, 120.223539))
-                    .add(new LatLng(22.995571, 120.221539));*/
+            latLngs.add(new LatLng(21.2, 121.3));
+            latLngs.add(new LatLng(21.3, 121.2));
+            rectOptions.addAll(latLngs);
             mMap.addPolyline(rectOptions);
             latituude.clear();
             longitude.clear();
