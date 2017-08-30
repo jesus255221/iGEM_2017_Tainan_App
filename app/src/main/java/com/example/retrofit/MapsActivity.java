@@ -4,13 +4,12 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -53,7 +52,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Update_Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //GetData();
+                GetData();
             }
         });
     }
@@ -71,7 +70,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Toast.makeText(getApplicationContext(), "Ready", Toast.LENGTH_SHORT);
+        Toast.makeText(getApplicationContext(), "Ready", Toast.LENGTH_SHORT).show();
         mMap = googleMap;
         // Add a marker in Sydney and move the camera
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -87,7 +86,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         runnable = new Runnable() {
             @Override
             public void run() {
-                Log.d("RUNNING", "RINNING");
+                //Toast.makeText(getApplicationContext(), "Running", Toast.LENGTH_SHORT).show();
                 if (isNetworkConnected()) {
                     Retrofit retrofit = new Retrofit
                             .Builder()
@@ -99,6 +98,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         @Override
                         public void onResponse(Call<locationsResponse> call, Response<locationsResponse> response) {
                             for (int i = 0; i < response.body().getLocations().size(); i++) {
+                                //Toast.makeText(getApplicationContext(), "Responsing", Toast.LENGTH_SHORT).show();
                                 latituude.add(i, response.body().getLocations().get(i).getLatitude() / 100);
                                 longitude.add(i, response.body().getLocations().get(i).getLongitude() / 100);
                                 latLngs.add(i, new LatLng(latituude.get(i), longitude.get(i)));
@@ -119,6 +119,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 } else {
                     Toast.makeText(getApplicationContext(), "NetWorkERROR", Toast.LENGTH_SHORT).show();
                 }
+                handler.postDelayed(this, 10000);
             }
         };
         handler.post(runnable);
@@ -136,13 +137,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 } else {
                     Toast.makeText(getApplicationContext(), "Location permissions ERROR", Toast.LENGTH_LONG).show();
                     finish();
-
                 }
                 break;
         }
     }
 
     public void GetData() {
+        //Toast.makeText(getApplicationContext(), "Get", Toast.LENGTH_SHORT).show();
         if (isNetworkConnected()) {
             Retrofit retrofit = new Retrofit
                     .Builder()
@@ -158,6 +159,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         longitude.add(i, response.body().getLocations().get(i).getLongitude() / 100);
                         latLngs.add(i, new LatLng(latituude.get(i), longitude.get(i)));
                     }
+                    //Toast.makeText(getApplicationContext(), "Response", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
@@ -170,7 +172,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.addPolyline(rectOptions);
             latituude.clear();
             longitude.clear();
-            latLngs.clear();
         } else {
             Toast.makeText(this, "NetWorkERROR", Toast.LENGTH_SHORT).show();
         }
@@ -180,5 +181,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         return connectivityManager.getActiveNetworkInfo() != null;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (handler != null) {
+            handler.removeCallbacks(runnable);
+        }
     }
 }
