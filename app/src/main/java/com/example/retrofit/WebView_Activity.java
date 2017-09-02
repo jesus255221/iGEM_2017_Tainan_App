@@ -19,6 +19,6 @@ public class WebView_Activity extends AppCompatActivity {
         webView.getSettings().setJavaScriptEnabled(true);
         setContentView(webView);
         webView.setWebViewClient(new WebViewClient());
-        webView.loadUrl("https://www.facebook.com");
+        webView.loadUrl("http://yanbo.ee.ncku.edu.tw/home");
     }
 }

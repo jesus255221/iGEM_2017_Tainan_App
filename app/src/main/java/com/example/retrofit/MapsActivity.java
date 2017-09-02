@@ -80,13 +80,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Show rationale and request permission.
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOCATION_REQUEST_CODE);
         }
-        LatLng sydney = new LatLng(22.995571, 120.221539);
+        /*LatLng sydney = new LatLng(22.995571, 120.221539);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker of my home"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
         runnable = new Runnable() {
             @Override
             public void run() {
-                //Toast.makeText(getApplicationContext(), "Running", Toast.LENGTH_SHORT).show();
                 if (isNetworkConnected()) {
                     Retrofit retrofit = new Retrofit
                             .Builder()
@@ -98,10 +97,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         @Override
                         public void onResponse(Call<locationsResponse> call, Response<locationsResponse> response) {
                             for (int i = 0; i < response.body().getLocations().size(); i++) {
-                                //Toast.makeText(getApplicationContext(), "Responsing", Toast.LENGTH_SHORT).show();
                                 latituude.add(i, response.body().getLocations().get(i).getLatitude() / 100);
                                 longitude.add(i, response.body().getLocations().get(i).getLongitude() / 100);
                                 latLngs.add(i, new LatLng(latituude.get(i), longitude.get(i)));
+                                if (i == (response.body().getLocations().size() - 1)) {
+                                    mMap.addMarker(new MarkerOptions()
+                                    .position(new LatLng(latituude.get(i),longitude.get(i)))
+                                    );
+                                }
                             }
                         }
 
