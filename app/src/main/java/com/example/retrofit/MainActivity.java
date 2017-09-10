@@ -11,9 +11,11 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
@@ -41,6 +43,10 @@ import retrofit2.http.Path;
 
 public class MainActivity extends AppCompatActivity {
 
+    private String[] titles;//Drawer titles
+    private DrawerLayout drawerLayout;//Drawer layout
+    private ListView listView;//Drawer List
+
     public interface Service {
         @FormUrlEncoded
         @POST("/users")
@@ -48,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
                 @Field("name") String name,
                 @Field("glucose") String glucose
         );
+
         @FormUrlEncoded
         @PUT("/users/{id}")
         Call<JsonResponse> Update(
@@ -55,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 @Field("name") String name,
                 @Field("glucose") String glucose
         );
+
         /*@POST("/.json")
         Call<String> PostArray(
                 @Body List<GlucoseData> data
@@ -70,6 +78,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //Set Drawer
+        titles = getResources().getStringArray(R.array.titles);
+        drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        listView = (ListView)findViewById(R.id.drawer);
+        listView.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1,titles));
+        //Drawer setting finished
         Button button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -108,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast toast = Toast.makeText(MainActivity.this, "DB failed", Toast.LENGTH_LONG);
                     toast.show();
                 }*/
-                Intent intent = new Intent(MainActivity.this,Graph.class);
+                Intent intent = new Intent(MainActivity.this, Graph.class);
                 startActivity(intent);
             }
         });
@@ -122,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        Button Map_Button = (Button)findViewById(R.id.Map_Button);
+        Button Map_Button = (Button) findViewById(R.id.Map_Button);
         Map_Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             SQLiteDatabase database = sqLiteOpenHelper.getReadableDatabase();
             Cursor cursor = database.query("DATA",
-                    new String[]{"_id","NAME"}, null, null, null, null, null);
+                    new String[]{"_id", "NAME"}, null, null, null, null, null);
             CursorAdapter cursorAdapter = new SimpleCursorAdapter(
                     MainActivity.this,
                     android.R.layout.simple_list_item_1,
@@ -152,13 +167,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRestart(){
+    public void onRestart() {
         super.onRestart();
         SQLiteOpenHelper sqLiteOpenHelper = new DatabaseHelper(MainActivity.this);
         try {
             SQLiteDatabase database = sqLiteOpenHelper.getReadableDatabase();
             Cursor cursor = database.query("DATA",
-                    new String[]{"_id","NAME"}, null, null, null, null, null);
+                    new String[]{"_id", "NAME"}, null, null, null, null, null);
             CursorAdapter cursorAdapter = new SimpleCursorAdapter(
                     MainActivity.this,
                     android.R.layout.simple_list_item_1,
@@ -204,12 +219,11 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
                         ContentValues contentValues = new ContentValues();
-                        contentValues.put("POST",1);
-                        try{
-                            database.update("DATA",contentValues,"_id = ?",new String[]{Integer.toString(cursor.getInt(0))});
-                        }
-                        catch (SQLiteException e){
-                            Toast toast = Toast.makeText(MainActivity.this,e.getMessage().toString(),Toast.LENGTH_LONG);
+                        contentValues.put("POST", 1);
+                        try {
+                            database.update("DATA", contentValues, "_id = ?", new String[]{Integer.toString(cursor.getInt(0))});
+                        } catch (SQLiteException e) {
+                            Toast toast = Toast.makeText(MainActivity.this, e.getMessage().toString(), Toast.LENGTH_LONG);
                             toast.show();
                         }
                         cursor.moveToNext();
@@ -241,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
                 textView.setText(t.toString());
             }
         });*/
-            return true;
+        return true;
     }
 
     private boolean isNetworkConnected() {
